@@ -97,11 +97,37 @@ router.put("/update", function (req, res, next) {
 
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `UPDATE members SET email=?, password=?, gitHbirthdateub=? WHERE id=?`;
+    const sql = `UPDATE users SET email=?, password=?, gitHbirthdateub=? WHERE id=?`;
     connection.query(sql, [email, password, birthdate, id], function (err, results) {
       if (err) throw err;
       connection.release();
       res.json({ success: true });
+    });
+  });
+});
+
+router.get("/:id", function (req, res, next) {
+  var id = req.params.id;
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT * FROM users WHERE id=${id}`;
+    console.log("SQL!!!", sql);
+    connection.query(sql, function (err, results) {
+      if (err) throw err;
+      if (results.length == 0) {
+        connection.release();
+        res.status(401);
+        res.json({
+          "errorCode": "LGN112",
+          "message": "You are not authorized to acceess this resource"
+        });
+
+      } else {
+        connection.release();
+        res.json({
+          success: true, id, results
+        });
+      }
     });
   });
 });
