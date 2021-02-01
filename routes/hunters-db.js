@@ -11,17 +11,17 @@ const pool = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
-  database: "teams"
+  database: "hunters"
 });
 
 /**
- * run this before first USAGE to create members TABLE
+ * run this before first USAGE to create hunters TABLE
  */
 router.get("/install", function (req, res, next) {
   pool.getConnection(function (err, connection) {
     if (err) throw err;
     const sql = `
-    CREATE TABLE IF NOT EXISTS members (id INT NOT NULL AUTO_INCREMENT, firstName TEXT NOT NULL, lastName TEXT NOT NULL, gitHub TEXT NOT NULL, PRIMARY KEY (id)) ENGINE = InnoDB;
+    CREATE TABLE IF NOT EXISTS users (id INT NOT NULL AUTO_INCREMENT, email TEXT NOT NULL, password TEXT NOT NULL, birthdate TEXT NOT NULL, PRIMARY KEY (id)) ENGINE = InnoDB;
     `;
     connection.query(sql, function (err, results) {
       if (err) throw err;
@@ -37,7 +37,7 @@ router.get("/install", function (req, res, next) {
 router.get("/", function (req, res, next) {
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `SELECT id, firstName, lastName, gitHub FROM members`;
+    const sql = `SELECT id, email, password, birthdate FROM users`;
     connection.query(sql, function (err, results) {
       if (err) throw err;
       connection.release();
@@ -50,14 +50,14 @@ router.get("/", function (req, res, next) {
  *
  */
 router.post("/create", function (req, res, next) {
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
-  const gitHub = req.body.gitHub;
+  const email = req.body.email;
+  const password = req.body.password;
+  const birthdate = req.body.birthdate;
 
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `INSERT INTO members (id, firstName, lastName, gitHub) VALUES (NULL, ?, ?, ?);`;
-    connection.query(sql, [firstName, lastName, gitHub], function (err, results) {
+    const sql = `INSERT INTO users (id, email, password, birthdate) VALUES (NULL, ?, ?, ?);`;
+    connection.query(sql, [email, password, birthdate], function (err, results) {
       if (err) throw err;
       const id = results.insertId;
       connection.release();
@@ -77,7 +77,7 @@ router.delete("/delete", function (req, res, next) {
 
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `DELETE FROM members WHERE id=?`;
+    const sql = `DELETE FROM users WHERE id=?`;
     connection.query(sql, [id], function (err, results) {
       if (err) throw err;
       connection.release();
@@ -91,14 +91,14 @@ router.delete("/delete", function (req, res, next) {
  */
 router.put("/update", function (req, res, next) {
   const id = req.body.id;
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
-  const gitHub = req.body.gitHub;
+  const email = req.body.firstName;
+  const password = req.body.password;
+  const birthdate = req.body.birthdate;
 
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `UPDATE members SET firstName=?, lastName=?, gitHub=? WHERE id=?`;
-    connection.query(sql, [firstName, lastName, gitHub, id], function (err, results) {
+    const sql = `UPDATE members SET email=?, password=?, gitHbirthdateub=? WHERE id=?`;
+    connection.query(sql, [email, password, birthdate, id], function (err, results) {
       if (err) throw err;
       connection.release();
       res.json({ success: true });

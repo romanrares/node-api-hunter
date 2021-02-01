@@ -7,8 +7,8 @@ var logger = require("morgan");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var teamsDBRouter = require("./routes/teams-db");
-var huntersRouter = require("./routes/hunters-json");
+var huntersDBRouter = require("./routes/hunters-db");
+var huntersRouter = require("./routes/hunters");
 
 var app = express();
 
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/teams", teamsDBRouter);
+app.use("/hunters", huntersDBRouter);
 app.use("/hunters-json", huntersRouter);
 
 // catch 404 and forward to error handler
