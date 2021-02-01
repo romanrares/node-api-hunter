@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var fs = require("fs");
 
-const DATA_PATH = "data/team.json";
+const DATA_PATH = "data/questions.json";
 
 /**
  * IMPORTANT: add content type headers to be able to use req.body.*
