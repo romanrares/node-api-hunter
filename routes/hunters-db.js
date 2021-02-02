@@ -111,7 +111,6 @@ router.get("/:id", function (req, res, next) {
   pool.getConnection(function (err, connection) {
     if (err) throw err;
     const sql = `SELECT * FROM users WHERE id=${id}`;
-    console.log("SQL!!!", sql);
     connection.query(sql, function (err, results) {
       if (err) throw err;
       if (results.length == 0) {
