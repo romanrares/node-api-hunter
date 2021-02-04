@@ -32,7 +32,7 @@ router.get("/install", function (req, res, next) {
 });
 
 /**
- *
+ * Should return all users (id, email, password, birthdate) from table 'users'
  */
 router.get("/", function (req, res, next) {
   pool.getConnection(function (err, connection) {
@@ -47,7 +47,7 @@ router.get("/", function (req, res, next) {
 });
 
 /**
- *
+ * Should create a new entry in table 'users' and returns the created resource ID
  */
 router.post("/create", function (req, res, next) {
   const email = req.body.email;
@@ -70,7 +70,7 @@ router.post("/create", function (req, res, next) {
 });
 
 /**
- *
+ * Should delete a user passing a user id in request body
  */
 router.delete("/delete", function (req, res, next) {
   const id = req.body.id;
@@ -106,6 +106,9 @@ router.put("/update", function (req, res, next) {
   });
 });
 
+/**
+ * Should return a userId if the user is in db
+ */
 router.get("/:id", function (req, res, next) {
   var id = req.params.id;
   pool.getConnection(function (err, connection) {
@@ -127,6 +130,21 @@ router.get("/:id", function (req, res, next) {
           success: true, id, results
         });
       }
+    });
+  });
+});
+
+/**
+ * Should retrieve all questions from table questions
+ */
+router.get("/question", function (req, res, next) {
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT name FROM questions WHERE 1`;
+    connection.query(sql, function (err, results) {
+      if (err) throw err;
+      connection.release();
+      res.json(results);
     });
   });
 });
