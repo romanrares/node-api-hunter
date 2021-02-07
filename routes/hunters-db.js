@@ -1,6 +1,6 @@
-var express = require("express");
-var router = express.Router();
-var mysql = require("mysql");
+const express = require("express");
+const router = express.Router();
+const mysql = require("mysql");
 
 /**
  * IMPORTANT: add content type headers to be able to use req.body.*
@@ -106,11 +106,54 @@ router.put("/update", function (req, res, next) {
   });
 });
 
+
+/**
+ * Should retrieve all questions from table questions
+ */
+router.get("/question", function (req, res, next) {
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT name FROM questions WHERE 1`;
+    connection.query(sql, function (err, results) {
+      if (err) throw err;
+      connection.release();
+      res.json(results);
+    });
+  });
+});
+
+/**
+ * Should retrieve 200 OK and the user data, if the user is in db
+ */
+router.post("/authenticate", function (req, res, next) {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT * FROM users WHERE email="${email}" AND password="${password}"`;
+    connection.query(sql, function (err, results) {
+      if (err) throw err;
+      if (results.length > 0) {
+        connection.release();
+        res.json(results);
+      } else {
+        res.status(401);
+        res.json({
+          "errorCode": "LGN401",
+          "message": "Invalid credentials."
+        });
+      }
+
+    });
+  });
+});
+
 /**
  * Should return a userId if the user is in db
  */
 router.get("/:id", function (req, res, next) {
-  var id = req.params.id;
+  const id = req.params.id;
   pool.getConnection(function (err, connection) {
     if (err) throw err;
     const sql = `SELECT * FROM users WHERE id=${id}`;
@@ -134,19 +177,6 @@ router.get("/:id", function (req, res, next) {
   });
 });
 
-/**
- * Should retrieve all questions from table questions
- */
-router.get("/question", function (req, res, next) {
-  pool.getConnection(function (err, connection) {
-    if (err) throw err;
-    const sql = `SELECT name FROM questions WHERE 1`;
-    connection.query(sql, function (err, results) {
-      if (err) throw err;
-      connection.release();
-      res.json(results);
-    });
-  });
-});
+
 
 module.exports = router;
