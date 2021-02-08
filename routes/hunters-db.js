@@ -123,6 +123,26 @@ router.get("/question", function (req, res, next) {
 });
 
 /**
+* Return random X questions from table questions
+*/
+
+router.get("/random", function (req, res, next) {
+  let param = undefined;
+  for (const key in req.query) {
+    param = req.query[key];
+  }
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT * FROM questions ORDER BY RAND() LIMIT ${param}`;
+    connection.query(sql, [param], function (err, results) {
+      if (err) throw err;
+      connection.release();
+      res.json(results);
+    });
+  });
+});
+
+/**
  * Should retrieve 200 OK and the user data, if the user is in db
  */
 router.post("/authenticate", function (req, res, next) {
