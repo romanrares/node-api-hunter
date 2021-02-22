@@ -133,7 +133,7 @@ router.get("/random", function (req, res, next) {
   }
   pool.getConnection(function (err, connection) {
     if (err) throw err;
-    const sql = `SELECT * FROM questions ORDER BY RAND() LIMIT ${param}`;
+    const sql = `SELECT id, text, option_a, option_b, option_c, image_path FROM questions ORDER BY RAND() LIMIT ${param}`;
     connection.query(sql, [param], function (err, results) {
       if (err) throw err;
       connection.release();
