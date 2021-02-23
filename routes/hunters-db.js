@@ -156,6 +156,7 @@ router.post("/authenticate", function (req, res, next) {
       if (err) throw err;
       if (results.length > 0) {
         connection.release();
+        res.cookie("test", email, { withCredentials: true, credentials: 'include' });
         res.json(results);
       } else {
         res.status(401);
@@ -165,6 +166,37 @@ router.post("/authenticate", function (req, res, next) {
         });
       }
 
+    });
+  });
+});
+
+/**
+ * Should retrieve all the requested answers like: 
+    {
+       "id": "1",
+        "option": "1",
+        "correct": "1",
+        "isCorrect": false
+    }
+ */
+router.post("/validate", function (req, res, next) {
+  pool.getConnection(function (err, connection) {
+    if (err) throw err;
+    const sql = `SELECT id, answer FROM questions WHERE id IN (${Array(req.body.length).fill('?').join(', ')})`;
+    connection.query(sql, req.body.map(answer => answer.id), function (err, results) {
+      if (err) throw err
+      results = JSON.parse(JSON.stringify(results))
+
+      const finalResp = [];
+      for (const answer of req.body) {
+        const correctedAnswer = { ...answer };
+        const dbAnswer = results.find(r => r.id == answer.id);
+        correctedAnswer.correct = answer.option;
+        correctedAnswer.isCorrect = dbAnswer.answer == answer.option
+        finalResp.push(correctedAnswer);
+      }
+      connection.release();
+      res.json(finalResp);
     });
   });
 });
