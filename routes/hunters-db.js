@@ -191,7 +191,7 @@ router.post("/validate", function (req, res, next) {
       for (const answer of req.body) {
         const correctedAnswer = { ...answer };
         const dbAnswer = results.find(r => r.id == answer.id);
-        correctedAnswer.correct = answer.option;
+        correctedAnswer.correct = dbAnswer.answer.toString();
         correctedAnswer.isCorrect = dbAnswer.answer == answer.option
         finalResp.push(correctedAnswer);
       }
