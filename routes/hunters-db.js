@@ -187,16 +187,30 @@ router.post("/validate", function (req, res, next) {
       if (err) throw err
       results = JSON.parse(JSON.stringify(results))
 
-      const finalResp = [];
-      for (const answer of req.body) {
-        const correctedAnswer = { ...answer };
-        const dbAnswer = results.find(r => r.id == answer.id);
-        correctedAnswer.correct = dbAnswer.answer.toString();
-        correctedAnswer.isCorrect = dbAnswer.answer == answer.option
-        finalResp.push(correctedAnswer);
-      }
+      const answers = req.body.map(resp => {
+        const correct = results.find(r => r.id == resp.id);
+        return {
+          ...resp,
+          correct: correct.answer,
+          isCorrect: correct.answer == resp.option
+        }
+      })
+
+      const incorrectAnwsers = answers.reduce((acc, curr) => {
+        if (!curr.isCorrect) {
+          acc = acc + 1;
+        }
+        return acc;
+      }, 0);
+
+      const grade = (incorrectAnwsers / answers.length) * 10;
+
+      res.json({
+        answers,
+        grade
+      });
+
       connection.release();
-      res.json(finalResp);
     });
   });
 });
