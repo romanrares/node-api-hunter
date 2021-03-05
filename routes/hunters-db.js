@@ -196,8 +196,22 @@ router.post("/validate", function (req, res, next) {
         }
       })
 
+      const correctAnwsers = answers.reduce((acc, curr) => {
+        if (curr.isCorrect) {
+          acc = acc + 1;
+        }
+        return acc;
+      }, 0);
+
       const incorrectAnwsers = answers.reduce((acc, curr) => {
         if (!curr.isCorrect) {
+          acc = acc + 1;
+        }
+        return acc;
+      }, 0);
+
+      const totalNumberOfQuestions = answers.reduce((acc, curr) => {
+        if (curr) {
           acc = acc + 1;
         }
         return acc;
@@ -207,7 +221,10 @@ router.post("/validate", function (req, res, next) {
 
       res.json({
         answers,
-        grade
+        grade,
+        totalNumberOfQuestions,
+        incorrectAnwsers,
+        correctAnwsers
       });
 
       connection.release();
